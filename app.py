@@ -1,10 +1,16 @@
-from flask import Flask, render_template
+from flask import Flask, make_response, render_template
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
     return render_template("index.html") 
+
+@app.route('/style.css')
+def css():
+    response = make_response('/static/style.css')
+    response.headers['Content-Type'] = 'text/css'
+    return response
 
 @app.after_request
 def add_header(response):
