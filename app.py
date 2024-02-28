@@ -4,7 +4,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template("index.html") 
+    return render_template("index.html")
+
+@app.route("/cat")
+def serve_cat():
+    return render_template('image.html')
 
 @app.after_request
 def add_header(response):
