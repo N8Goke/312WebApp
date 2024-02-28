@@ -1,4 +1,8 @@
 from flask import Flask, make_response, render_template
+from pymongo import MongoClient
+
+mongo_client = MongoClient("mongo")
+db = mongo_client["teamInnovation"]
 
 app = Flask(__name__)
 
@@ -9,6 +13,10 @@ def index():
 @app.route("/cat")
 def serve_cat():
     return render_template('image.html')
+
+@app.route('/registration')
+def registration():
+    return render_template("registration.html") 
 
 @app.route('/style.css')
 def css():
