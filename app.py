@@ -3,6 +3,7 @@ from pymongo import MongoClient
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
+chat_collection = db["projectChat"]
 
 app = Flask(__name__)
 
@@ -24,6 +25,7 @@ def css():
     response.headers['Content-Type'] = 'text/css'
     return response
 
+# Sets nosniff to all requests.
 @app.after_request
 def add_header(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
