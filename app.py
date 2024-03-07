@@ -1,5 +1,6 @@
 from flask import Flask, make_response, render_template
 from pymongo import MongoClient
+from flask_bcrypt import Bcrypt
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -36,7 +37,18 @@ def add_header(response):
     return response
 
 # Nate/Danny - Check if username/pass exist in database collection
-tmp = list(chat_collection.find({}))
+def userCheck(jsonString):
+    updict = jsonString.loads()
+    username = updict["username"]
+    plaintextpass = updict["password"]
+    dbData = chat_collection.findOne({"username": username})
+    if dbData == None:
+        return False
+    else:
+        is_valid = bcrypt.check_password_hash(dbData["password"], plaintextpass)
+        return is_valid
+
+
 
 
 if __name__ == '__main__':
