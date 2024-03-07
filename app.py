@@ -31,5 +31,9 @@ def add_header(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
+# Nate/Danny - Check if username/pass exist in database collection
+tmp = list(chat_collection.find({}))
+
+
 if __name__ == '__main__':
     app.run(host = '0.0.0.0', port = 8080)
