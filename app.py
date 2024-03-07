@@ -19,6 +19,10 @@ def serve_cat():
 def registration():
     return render_template("registration.html") 
 
+@app.route('/login')
+def login():
+    return render_template("login.html")
+
 @app.route('/style.css')
 def css():
     response = make_response('/static/style.css')
