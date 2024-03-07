@@ -15,14 +15,14 @@ def index():
 @app.route("/cat")
 def serve_cat():
     return render_template('image.html')
-
-@app.route('/registration')
-def registration():
-    return render_template("registration.html") 
-
-@app.route('/login')
-def login():
-    return render_template("login.html")
+#both registration and login forms should be on the index.html
+# @app.route('/registration')
+# def registration():
+#     return render_template("registration.html")
+#
+# @app.route('/login')
+# def login():
+#     return render_template("login.html")
 
 @app.route('/style.css')
 def css():

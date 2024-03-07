@@ -1,9 +1,32 @@
-<html>
-    <head>
-        <title>Team Innovation</title>
-    </head>
-    <body>
-        <link  rel="stylesheet" href="/static/style.css">
-        <h1>Index html page woohoo</h1>
-    </body>
+<html lang="en">
+<head>
+    <title>CSE312 Group Project: Team Innovation</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+    <script type="text/javascript" src="../static/registration.js"></script>
+</head>
+<body>
+<h1>Home</h1>
+<div class="reg-login-forms">
+    <h2>Registration:</h2>
+    <form id="registration-form">
+        <label for="username">Username:
+            <input type="text" name="username_reg" placeholder="Your Username">
+        </label>
+        <label for="password">Password:
+            <input type="password" name="password_reg" placeholder="Your Password">
+        </label>
+        <button type="button" value="sign-up" onclick="register();">Submit</button>
+    </form>
+    <h2>Login:</h2>
+    <form id="login-form">
+        <label for="username">Username:
+            <input type="text" name="username_login" placeholder="Your username">
+        </label>
+        <label for="password">Password:
+            <input type="text" name="password_login" placeholder="Your password">
+        </label>
+        <input type="submit" value="login"/>
+    </form>
+</div>
+</body>
 </html>
