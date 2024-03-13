@@ -1,6 +1,7 @@
-from flask import Flask, make_response, render_template, request
+from flask import Flask, make_response, render_template, request, redirect, url_for
 from pymongo import MongoClient
 import json
+import bcrypt
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -10,20 +11,12 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
+    print("INDEX INDEX")
     return render_template("index.html")
 
 @app.route("/cat")
 def serve_cat():
     return render_template('image.html')
-
-#both registration and login forms should be on the index.html
-# @app.route('/registration')
-# def registration():
-#     return render_template("registration.html")
-#
-# @app.route('/login')
-# def login():
-#     return render_template("login.html")
 
 
 # Andy - insert username and password into db
@@ -35,15 +28,18 @@ def registrationServer():
 
     print(username, password)
 
+    salt = bcrypt.gensalt()
+    password = bcrypt.hashpw(password, salt)
+
     data2 = {}
     data2['username'] = username
     data2['password'] = password
 
     print(data2)
+
     chat_collection.insert_one(data2)
 
-    return ("HTTP/l.1 200 OK\r\nContent-Length: 5\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n").encode() + ("hello").encode()
-
+    return
 
 
 @app.route('/style.css')
