@@ -29,7 +29,7 @@ def registrationServer():
     print(username, password)
 
     salt = bcrypt.gensalt()
-    password = bcrypt.hashpw(password, salt)
+    password = bcrypt.hashpw(password.encode(), salt)
 
     data2 = {}
     data2['username'] = username
@@ -39,7 +39,9 @@ def registrationServer():
 
     chat_collection.insert_one(data2)
 
-    return
+    print("WHAT")
+
+    return redirect("/", code=302)
 
 
 @app.route('/style.css')
