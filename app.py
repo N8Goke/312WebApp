@@ -5,6 +5,7 @@ import bcrypt
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
+# user_collection = db["userInfo"]
 chat_collection = db["projectChat"]
 
 app = Flask(__name__)
@@ -43,6 +44,15 @@ def registrationServer():
 
     return redirect("/", code=302)
 
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    login_pw = data.get('password')
+    details = chat_collection.find_one({'username':username})
+    stored_pw = details.get('password')
+    is_Valid = bcrypt.checkpw(stored_pw, login_pw)
+    if is_Valid:
 
 @app.route('/style.css')
 def css():
