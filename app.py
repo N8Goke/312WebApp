@@ -1,4 +1,4 @@
-from flask import Flask, make_response, render_template, request, redirect, url_for
+from flask import Flask, make_response, render_template, request, redirect, url_for, abort
 from pymongo import MongoClient
 import json
 import bcrypt
@@ -38,11 +38,18 @@ def registrationServer():
 
     print(data2)
 
-    chat_collection.insert_one(data2)
+    query = {"username": username}
+    found = chat_collection.find_one(query)
 
-    print("WHAT")
+    if found != None:
+        return abort(404)
+    else:
 
-    return redirect("/", code=302)
+        chat_collection.insert_one(data2)
+
+        return "success"
+        
+    return abort(404)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -53,6 +60,7 @@ def login():
     stored_pw = details.get('password')
     is_Valid = bcrypt.checkpw(stored_pw, login_pw)
     if is_Valid:
+        
 
 @app.route('/style.css')
 def css():
