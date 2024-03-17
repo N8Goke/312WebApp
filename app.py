@@ -8,6 +8,7 @@ db = mongo_client["teamInnovation"]
 
 user_collection = db["userInfo"]
 chat_collection = db["projectChat"]
+count_collection = db["chatcounter"]
 
 app = Flask(__name__)
 
@@ -71,21 +72,39 @@ def login():
     if is_Valid:
         x = 0
 
-"""
-@app.route('/sendpost', method = ['POST'])
+
+@app.route('/sendpost', methods=['POST'])
 def sendpost():
+
+    jsondata = request.get_json()
+
+    #escapehtml
+    
+    count = list(count_collection.find())
+    if len(count) == 0:
+        count_collection.insert_one({"id" : 1})
+        count = list(count_collection.find())
+
+    print(count)
+    count = count[0]['id']
+    count_collection.update_one({'id' : count}, {'$inc': {'id': 1}})
+
     data = {}
-    data["id"] = 69
+    data["id"] = count
     data["username"] = "guest"
-    data["message"] = "hello world"
+    data["message"] = jsondata.get("message")
 
     chat_collection.insert_one(data)
 
-    print(data)
+    data2 = {}
+    data2["id"] = data["id"]
+    data2["username"] = data["username"]
+    data2["message"] = data["message"]
+    print(data2)
+    
+    return data2
 
-    return data
-
-
+"""
 @app.route('/allposts', methods = ['GET'])
 def allposts():
     dbdata = chat_collection.find()

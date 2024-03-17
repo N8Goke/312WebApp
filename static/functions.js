@@ -6,7 +6,13 @@ function sendpost()
             console.log(this.response);
         }
     }
+    var message = document.getElementById("message").value
+    data = {"message": message}
+
+    document.getElementById("message").value = ""
+
     request.open("POST", "/sendpost")
-    request.send()
+    request.setRequestHeader('Content-Type', 'application/json')
+    request.send(JSON.stringify(data))
 
 }
