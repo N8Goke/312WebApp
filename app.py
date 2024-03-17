@@ -5,7 +5,8 @@ import bcrypt
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
-# user_collection = db["userInfo"]
+
+user_collection = db["userInfo"]
 chat_collection = db["projectChat"]
 
 app = Flask(__name__)
@@ -26,9 +27,16 @@ def registrationServer():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+    password2 = data.get('password2')
 
-    print(username, password)
+    print(username, password, password2)
 
+    #check if the two pw are the same
+    if password != password2:
+        return abort(404)
+
+    #since its the same, we salt and hash the pw
+    #then attempt to put it in db
     salt = bcrypt.gensalt()
     password = bcrypt.hashpw(password.encode(), salt)
 
@@ -38,14 +46,15 @@ def registrationServer():
 
     print(data2)
 
+    #check if username already exists. If it exists we exist, otherwise we insert
     query = {"username": username}
-    found = chat_collection.find_one(query)
+    found = user_collection.find_one(query)
 
     if found != None:
         return abort(404)
     else:
 
-        chat_collection.insert_one(data2)
+        user_collection.insert_one(data2)
 
         return "success"
         
@@ -56,11 +65,43 @@ def login():
     data = request.get_json()
     username = data.get('username')
     login_pw = data.get('password')
-    details = chat_collection.find_one({'username':username})
+    details = user_collection.find_one({'username':username})
     stored_pw = details.get('password')
     is_Valid = bcrypt.checkpw(stored_pw, login_pw)
     if is_Valid:
-        
+        x = 0
+
+"""
+@app.route('/sendpost', method = ['POST'])
+def sendpost():
+    data = {}
+    data["id"] = 69
+    data["username"] = "guest"
+    data["message"] = "hello world"
+
+    chat_collection.insert_one(data)
+
+    print(data)
+
+    return data
+
+
+@app.route('/allposts', methods = ['GET'])
+def allposts():
+    dbdata = chat_collection.find()
+
+    allposts = []
+
+    for post in dbdata:
+        post2 = {}
+        post2['id'] = post['id']
+        post2['username'] = post['username']
+        post2['message'] = post['message']
+
+        allposts.append(post2)
+
+    return allposts
+"""
 
 @app.route('/style.css')
 def css():
@@ -79,7 +120,7 @@ def userCheck(jsonString):
     updict = jsonString.loads()
     username = updict["username"]
     plaintextpass = updict["password"]
-    dbData = chat_collection.findOne({"username": username})
+    dbData = user_collection.findOne({"username": username})
     if dbData == None:
         return False
     else:

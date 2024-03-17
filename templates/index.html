@@ -3,6 +3,7 @@
     <title>CSE312 Group Project: Team Innovation</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css"/>
     <script type="text/javascript" src="../static/registration.js"></script>
+    <script type="text/javascript" src="../static/functions.js"></script>
 </head>
 <body>
 <h1>Home</h1>
@@ -14,6 +15,7 @@
         </label>
         <label for="password">Password:
             <input type="password" name="password" id="password"  placeholder="Your Password">
+            <input type="password" name="password2" id="password2"  placeholder="Enter Your Password Again">
         </label>
         <button type="button" value="sign-up" onclick="register();">Submit</button>
     </form>
@@ -27,6 +29,14 @@
         </label>
         <input type="submit" value="login"/>
     </form>
+
+
+    <form id = "sendpostform">
+        <button type="button" value="sendpost" onclick="sendpost();">Send</button>
+    </form>
+
+
+
 </div>
 </body>
 </html>
