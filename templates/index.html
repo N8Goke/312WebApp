@@ -5,7 +5,7 @@
     <script type="text/javascript" src="../static/registration.js"></script>
     <script type="text/javascript" src="../static/functions.js"></script>
 </head>
-<body>
+<body onload="allposts();">
 <h1>Home</h1>
 <div class="reg-login-forms">
     <h2>Registration:</h2>
@@ -39,8 +39,9 @@
         <button type="button" value="sendpost" onclick="sendpost();">Send</button>
     </form>
 
-
+    <div id="chat-messages"></div>
 
 </div>
+
 </body>
 </html>

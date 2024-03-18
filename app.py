@@ -104,7 +104,7 @@ def sendpost():
     
     return data2
 
-"""
+
 @app.route('/allposts', methods = ['GET'])
 def allposts():
     dbdata = chat_collection.find()
@@ -120,7 +120,7 @@ def allposts():
         allposts.append(post2)
 
     return allposts
-"""
+
 
 @app.route('/style.css')
 def css():

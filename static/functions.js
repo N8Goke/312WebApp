@@ -16,3 +16,18 @@ function sendpost()
     request.send(JSON.stringify(data))
 
 }
+
+function allposts()
+{
+    request = new XMLHttpRequest();   
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+            
+            chatMessages = document.getElementById("chat-messages");
+            chatMessages.innerHTML += this.response;
+        }
+    }
+    request.open("GET", "/allposts")
+    request.send()
+}
