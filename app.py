@@ -3,6 +3,7 @@ from pymongo import MongoClient
 import json
 import bcrypt
 import html
+import secrets
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -68,10 +69,24 @@ def login():
     username = data.get('username')
     login_pw = data.get('password')
     details = user_collection.find_one({'username':username})
+
+    if details == None:
+        print("db lookup invalid")
+        return abort(404)
+
     stored_pw = details.get('password')
     is_Valid = bcrypt.checkpw(stored_pw, login_pw)
+
     if is_Valid:
-        x = 0
+        atoken = secrets.token_bytes()
+        chat_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
+        print("atoken updated")
+        response = make_response()
+        response.set_cookie("atoken",atoken)
+        return response
+    else:
+        return abort(404)
+
 
 
 @app.route('/sendpost', methods=['POST'])
@@ -90,9 +105,14 @@ def sendpost():
     count = count[0]['id']
     count_collection.update_one({'id' : count}, {'$inc': {'id': 1}})
 
+    username = "guest"
+    if request.cookies.get("atoken") != None:
+        details =user_collection.find_one({"atoken": request.cookies.get("atoken")})
+        username = details["username"]
+
     data = {}
     data["id"] = count
-    data["username"] = "guest"
+    data["username"] = username
     data["message"] = html.escape(jsondata.get("message"))
     data["likes"] = 0
 
