@@ -82,7 +82,7 @@ def login():
         chat_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
         print("atoken updated")
         response = make_response()
-        response.set_cookie("atoken",atoken)
+        response.set_cookie("atoken",atoken.decode())
         return response
     else:
         return abort(404)
