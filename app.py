@@ -1,7 +1,8 @@
-from flask import Flask, make_response, render_template, request, redirect, url_for, abort
+from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify
 from pymongo import MongoClient
 import json
 import bcrypt
+import html
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -30,7 +31,7 @@ def registrationServer():
     password = data.get('password')
     password2 = data.get('password2')
 
-    print(username, password, password2)
+    #print(username, password, password2)
 
     #check if the two pw are the same
     if password != password2:
@@ -45,7 +46,7 @@ def registrationServer():
     data2['username'] = username
     data2['password'] = password
 
-    print(data2)
+    #print(data2)
 
     #check if username already exists. If it exists we exist, otherwise we insert
     query = {"username": username}
@@ -85,14 +86,15 @@ def sendpost():
         count_collection.insert_one({"id" : 1})
         count = list(count_collection.find())
 
-    print(count)
+    #print(count)
     count = count[0]['id']
     count_collection.update_one({'id' : count}, {'$inc': {'id': 1}})
 
     data = {}
     data["id"] = count
     data["username"] = "guest"
-    data["message"] = jsondata.get("message")
+    data["message"] = html.escape(jsondata.get("message"))
+    data["likes"] = 0
 
     chat_collection.insert_one(data)
 
@@ -100,7 +102,8 @@ def sendpost():
     data2["id"] = data["id"]
     data2["username"] = data["username"]
     data2["message"] = data["message"]
-    print(data2)
+    data2["likes"] = data["likes"]
+    #print(data2)
     
     return data2
 
@@ -116,10 +119,30 @@ def allposts():
         post2['id'] = post['id']
         post2['username'] = post['username']
         post2['message'] = post['message']
+        post2['likes'] = post['likes']
 
         allposts.append(post2)
 
-    return allposts
+    
+    #print(allposts)
+    return jsonify(allposts)
+
+
+@app.route('/like', methods = ['POST'])
+def like():
+    data = request.get_json()
+
+    #print(data)
+
+    id = data.get("id")
+
+    #print(id)
+
+    chat_collection.update_one({'id' : id}, {'$inc': {'likes': 1}})
+
+    #print(chat_collection.find_one({'id' : id}))
+
+    return "successfully liked"
 
 
 @app.route('/style.css')
