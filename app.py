@@ -52,7 +52,6 @@ def registrationServer():
     if found != None:
         return abort(404)
     else:
-
         user_collection.insert_one(data2)
 
         return "success"
@@ -77,7 +76,7 @@ def login():
     if is_Valid:
         #atoken = secrets.token_bytes()
         atoken = bcrypt.gensalt()
-        chat_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
+        user_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
         print("atoken updated")
         response = make_response()
         response.set_cookie("atoken", atoken.decode(), httponly = True)
@@ -104,14 +103,17 @@ def sendpost():
 
     username = "guest"
     if request.cookies.get("atoken") != None:
-        details =user_collection.find_one({"atoken": request.cookies.get("atoken")})
-        username = details["username"]
+        details = user_collection.find_one({"atoken": request.cookies.get("atoken").encode()})
+        #print(details)
+        if details != None:
+            username = details["username"]
 
     data = {}
     data["id"] = count
     data["username"] = username
     data["message"] = html.escape(jsondata.get("message"))
     data["likes"] = 0
+    data["likedBy"] = []
 
     chat_collection.insert_one(data)
 
@@ -146,10 +148,24 @@ def allposts():
 @app.route('/like', methods = ['POST'])
 def like():
     data = request.get_json()
-
     id = data.get("id")
 
-    chat_collection.update_one({'id' : id}, {'$inc': {'likes': 1}})
+    post_info = chat_collection.find_one({'id': id})
+    print(post_info)
+    likedBy = post_info["likedBy"]
+
+
+    atoken = request.cookies.get("atoken")
+    user_info = user_collection.find_one({"atoken": atoken.encode()})
+    print(user_info)
+    username = user_info["username"]
+
+    if username in likedBy:
+        return abort(404)
+    else:
+        likedBy = likedBy.append(username)
+        chat_collection.update_one({'id' : id}, {'$inc': {'likes': 1}})
+        chat_collection.update_one({'id' : id}, {'$push': {"likedBy" : username}})
 
     return "successfully liked"
 
