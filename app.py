@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    print("INDEX INDEX")
+    #print("INDEX INDEX")
     return render_template("index.html")
 
 @app.route("/cat")
@@ -32,8 +32,6 @@ def registrationServer():
     password = data.get('password')
     password2 = data.get('password2')
 
-    #print(username, password, password2)
-
     #check if the two pw are the same
     if password != password2:
         return abort(404)
@@ -46,8 +44,6 @@ def registrationServer():
     data2 = {}
     data2['username'] = username
     data2['password'] = password
-
-    #print(data2)
 
     #check if username already exists. If it exists we exist, otherwise we insert
     query = {"username": username}
@@ -67,8 +63,6 @@ def registrationServer():
 def login():
     data = request.get_json()
 
-    print(data)
-
     username = data.get('username')
     login_pw = data.get('password')
     details = user_collection.find_one({'username':username})
@@ -76,24 +70,19 @@ def login():
     if details == None:
         print("db lookup invalid")
         return abort(404)
-    
-    print(details)
 
     stored_pw = details.get('password')
     is_Valid = bcrypt.checkpw(login_pw.encode(), stored_pw)
-
-    print(is_Valid)
 
     if is_Valid:
         #atoken = secrets.token_bytes()
         atoken = bcrypt.gensalt()
         chat_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
         print("atoken updated")
-        #response = make_response()
-        #response.set_cookie("atoken",atoken.decode())
+        response = make_response()
+        response.set_cookie("atoken", atoken.decode(), httponly = True)
 
-        print(atoken.decode())
-        return atoken.decode()
+        return response
     else:
         return abort(404)
 
@@ -103,8 +92,6 @@ def login():
 def sendpost():
 
     jsondata = request.get_json()
-
-    #escapehtml
     
     count = list(count_collection.find())
     if len(count) == 0:
@@ -133,7 +120,6 @@ def sendpost():
     data2["username"] = data["username"]
     data2["message"] = data["message"]
     data2["likes"] = data["likes"]
-    #print(data2)
     
     return data2
 

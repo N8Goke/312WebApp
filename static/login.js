@@ -5,7 +5,6 @@ function login()
         if (this.readyState === 4 && this.status === 200) {
             console.log(this.response);
             window.location.replace("")
-            document.cookie = "auth=" + this.response;
         }
     }
     var username = document.getElementById("usernameL").value
