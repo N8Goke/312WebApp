@@ -4,6 +4,7 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css"/>
     <script type="text/javascript" src="../static/registration.js"></script>
     <script type="text/javascript" src="../static/functions.js"></script>
+    <script type="text/javascript" src="../static/login.js"></script>
 </head>
 <body onload="allposts();">
 <h1>Home</h1>
@@ -22,12 +23,12 @@
     <h2>Login:</h2>
     <form id="login-form">
         <label for="username">Username:
-            <input type="text" name="username_login" placeholder="Your username">
+            <input type="text" name="username_login" id="usernameL" placeholder="Your username">
         </label>
         <label for="password">Password:
-            <input type="text" name="password_login" placeholder="Your password">
+            <input type="text" name="password_login" id="passwordL" placeholder="Your password">
         </label>
-        <input type="submit" value="login"/>
+        <button type="button" onclick="login();" value="login">login</button>
     </form>
 
     <br>

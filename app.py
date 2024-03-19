@@ -66,6 +66,9 @@ def registrationServer():
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
+
+    print(data)
+
     username = data.get('username')
     login_pw = data.get('password')
     details = user_collection.find_one({'username':username})
@@ -73,17 +76,24 @@ def login():
     if details == None:
         print("db lookup invalid")
         return abort(404)
+    
+    print(details)
 
     stored_pw = details.get('password')
-    is_Valid = bcrypt.checkpw(stored_pw, login_pw)
+    is_Valid = bcrypt.checkpw(login_pw.encode(), stored_pw)
+
+    print(is_Valid)
 
     if is_Valid:
-        atoken = secrets.token_bytes()
+        #atoken = secrets.token_bytes()
+        atoken = bcrypt.gensalt()
         chat_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
         print("atoken updated")
-        response = make_response()
-        response.set_cookie("atoken",atoken.decode())
-        return response
+        #response = make_response()
+        #response.set_cookie("atoken",atoken.decode())
+
+        print(atoken.decode())
+        return atoken.decode()
     else:
         return abort(404)
 
@@ -143,7 +153,6 @@ def allposts():
 
         allposts.append(post2)
 
-    
     #print(allposts)
     return jsonify(allposts)
 
@@ -152,15 +161,9 @@ def allposts():
 def like():
     data = request.get_json()
 
-    #print(data)
-
     id = data.get("id")
 
-    #print(id)
-
     chat_collection.update_one({'id' : id}, {'$inc': {'likes': 1}})
-
-    #print(chat_collection.find_one({'id' : id}))
 
     return "successfully liked"
 
