@@ -4,6 +4,7 @@ import json
 import bcrypt
 import html
 import secrets
+import hashlib
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -76,15 +77,38 @@ def login():
     if is_Valid:
         #atoken = secrets.token_bytes()
         atoken = bcrypt.gensalt()
+        
+        # Fix checking for the auth token cookie
+        # if 'atoken' not in request.cookies:
+        #     request.cookies['atoken'] = secrets.token_hex(20)
+        # token = request.cookies.get('atoken')
+        # temp_hash = hashlib.new('sha256')
+        # temp_hash.update(token.encode())
+        # hashed_token = temp_hash.hexdigest()
+
         user_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
         print("atoken updated")
         response = make_response()
-        response.set_cookie("atoken", atoken.decode(), httponly = True)
+        response.set_cookie("atoken", atoken, httponly = True)
 
         return response
     else:
         return abort(404)
 
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    print("temporary")
+    if 'atoken' in request.cookies:
+        token = request.cookies.get('atoken')
+    
+        temp_hash = hashlib.new('sha256')
+        temp_hash.update(token.encode())
+        hashed_token = temp_hash.hexdigest()
+
+        if user_collection.find_one({'atoken': hashed_token}):
+            user_collection.update_one({'atoken':hashed_token}, {"$set":{'atoken':""}})
+            return redirect("/", code=302)
 
 
 @app.route('/sendpost', methods=['POST'])
@@ -183,16 +207,17 @@ def add_header(response):
     return response
 
 # Nate/Danny - Check if username/pass exist in database collection
-def userCheck(jsonString):
-    updict = jsonString.loads()
-    username = updict["username"]
-    plaintextpass = updict["password"]
-    dbData = user_collection.findOne({"username": username})
-    if dbData == None:
-        return False
-    else:
-        is_valid = bcrypt.check_password_hash(dbData["password"], plaintextpass)
-        return is_valid
+# obsolete -- ignore
+# def userCheck(jsonString):
+#     updict = jsonString.loads()
+#     username = updict["username"]
+#     plaintextpass = updict["password"]
+#     dbData = user_collection.findOne({"username": username})
+#     if dbData == None:
+#         return False
+#     else:
+#         is_valid = bcrypt.check_password_hash(dbData["password"], plaintextpass)
+#         return is_valid
 
 
 
