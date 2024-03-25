@@ -47,7 +47,7 @@ def registrationServer():
     password = bcrypt.hashpw(password.encode(), salt)
 
     data2 = {}
-    data2['username'] = username
+    data2['username'] = html.escape(username)
     data2['password'] = password
 
     #check if username already exists. If it exists we exist, otherwise we insert
@@ -213,6 +213,21 @@ def like():
 
     return "successfully liked"
 
+@app.route('/username', methods = ["GET"])
+def username():
+    atoken = request.cookies.get("atoken")
+    if atoken == None:
+        return "Guest"
+    
+    hash1 = hashlib.new('sha256')
+    hash1.update(atoken.encode())
+
+    user_info = user_collection.find_one({"atoken": hash1.hexdigest()})
+
+    if user_info == None:
+        return "Guest"
+    else:
+        return user_info["username"]
 
 @app.route('/style.css')
 def css():

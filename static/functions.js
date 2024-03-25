@@ -16,7 +16,19 @@ function sendpost()
     request.send(JSON.stringify(data))
 
 }
-
+function username()
+{
+    request = new XMLHttpRequest();   
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+            username = document.getElementById("your_username");
+            username.append(this.response)
+        }
+    }
+    request.open("GET", "/username")
+    request.send()
+}
 function allposts()
 {
     request = new XMLHttpRequest();   

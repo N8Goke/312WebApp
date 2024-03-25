@@ -6,7 +6,7 @@
     <script type="text/javascript" src="../static/functions.js"></script>
     <script type="text/javascript" src="../static/login.js"></script>
 </head>
-<body onload="allposts();">
+<body onload="allposts(); username();">
 <h1>Home</h1>
 <div class="reg-login-forms">
     <h2>Registration:</h2>
@@ -30,6 +30,9 @@
         </label>
         <button type="button" onclick="login();" value="login">login</button>
     </form>
+
+    <div id = "your_username"><h2>User:</h2></div>
+
     <h2>Logout:</h2>
     <form action="logout" method="post" enctype="applications/x-www-form-urlencoded">
         <!-- <input id="submit" value="logout"> -->
@@ -47,6 +50,8 @@
     <div id="chat-messages"></div>
 
 </div>
+
+<img src="../static/image/cat.jpg" alt="image of a cat">
 
 </body>
 </html>
