@@ -1,4 +1,4 @@
-from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify
+from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file
 from pymongo import MongoClient
 import json
 import bcrypt
@@ -20,9 +20,13 @@ def index():
     #print("INDEX INDEX")
     return render_template("index.html")
 
-@app.route("/cat")
-def serve_cat():
-    return render_template('image.html')
+# @app.route("/cat")
+# def serve_cat():
+#     return render_template('image.html')
+
+@app.route("/cat.jpg", endpoint="image_route")
+def image_route():
+    return send_file('static/image/cat.jpg', mimetype="image/jpeg")
 
 
 # Andy - insert username and password into db
@@ -81,6 +85,7 @@ def login():
         # Fix checking for the auth token cookie
         # if 'atoken' not in request.cookies:
         #     request.cookies['atoken'] = secrets.token_hex(20)
+
         # token = request.cookies.get('atoken')
         # temp_hash = hashlib.new('sha256')
         # temp_hash.update(token.encode())
