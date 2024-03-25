@@ -82,6 +82,9 @@ def login():
         #atoken = secrets.token_bytes()
         atoken = bcrypt.gensalt()
         
+        hash1 = hashlib.new('sha256')
+        hash1.update(atoken)
+
         # Fix checking for the auth token cookie
         # if 'atoken' not in request.cookies:
         #     request.cookies['atoken'] = secrets.token_hex(20)
@@ -91,10 +94,10 @@ def login():
         # temp_hash.update(token.encode())
         # hashed_token = temp_hash.hexdigest()
 
-        user_collection.update_one({"username": username}, {"$set": {"atoken": atoken}})
+        user_collection.update_one({"username": username}, {"$set": {"atoken": hash1.hexdigest()}})
         print("atoken updated")
         response = make_response()
-        response.set_cookie("atoken", atoken, httponly = True)
+        response.set_cookie("atoken", atoken.decode(), max_age=3600, httponly = True)
 
         return response
     else:
@@ -113,7 +116,9 @@ def logout():
 
         if user_collection.find_one({'atoken': hashed_token}):
             user_collection.update_one({'atoken':hashed_token}, {"$set":{'atoken':""}})
-            return redirect("/", code=302)
+            response = redirect("/", code=302)
+            response.set_cookie("atoken", "deleted", max_age=3600, httponly = True)
+            return response
 
 
 @app.route('/sendpost', methods=['POST'])
@@ -132,7 +137,13 @@ def sendpost():
 
     username = "guest"
     if request.cookies.get("atoken") != None:
-        details = user_collection.find_one({"atoken": request.cookies.get("atoken").encode()})
+
+
+        atoken = request.cookies.get("atoken")
+        hash1 = hashlib.new('sha256')
+        hash1.update(atoken.encode())
+
+        details = user_collection.find_one({"atoken": hash1.hexdigest()})
         #print(details)
         if details != None:
             username = details["username"]
@@ -185,7 +196,11 @@ def like():
 
 
     atoken = request.cookies.get("atoken")
-    user_info = user_collection.find_one({"atoken": atoken.encode()})
+    hash1 = hashlib.new('sha256')
+    hash1.update(atoken.encode())
+
+
+    user_info = user_collection.find_one({"atoken": hash1.hexdigest()})
     print(user_info)
     username = user_info["username"]
 
