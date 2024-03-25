@@ -1,9 +1,57 @@
-<html>
-    <head>
-        <title>Team Innovation</title>
-    </head>
-    <body>
-        <link  rel="stylesheet" href="/static/style.css">
-        <h1>Index html page woohoo</h1>
-    </body>
+<html lang="en">
+<head>
+    <title>CSE312 Group Project: Team Innovation</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+    <script type="text/javascript" src="../static/registration.js"></script>
+    <script type="text/javascript" src="../static/functions.js"></script>
+    <script type="text/javascript" src="../static/login.js"></script>
+</head>
+<body onload="allposts(); username();">
+<h1>Home</h1>
+<div class="reg-login-forms">
+    <h2>Registration:</h2>
+    <form id="registration-form">
+        <label for="username">Username:
+            <input type="text" name="username" id="username"  placeholder="Your Username">
+        </label>
+        <label for="password">Password:
+            <input type="password" name="password" id="password"  placeholder="Your Password">
+            <input type="password" name="password2" id="password2"  placeholder="Enter Your Password Again">
+        </label>
+        <button type="button" value="sign-up" onclick="register();">Submit</button>
+    </form>
+    <h2>Login:</h2>
+    <form id="login-form">
+        <label for="username">Username:
+            <input type="text" name="username_login" id="usernameL" placeholder="Your username">
+        </label>
+        <label for="password">Password:
+            <input type="text" name="password_login" id="passwordL" placeholder="Your password">
+        </label>
+        <button type="button" onclick="login();" value="login">login</button>
+    </form>
+
+    <div id = "your_username"><h2>User:</h2></div>
+
+    <h2>Logout:</h2>
+    <form action="logout" method="post" enctype="applications/x-www-form-urlencoded">
+        <!-- <input id="submit" value="logout"> -->
+        <button type="logoutbutton" value="loguout" onclick="logout()">Logout</button>
+    </form>
+    <br>
+    <h2>Posts</h2>
+    <form id = "sendpostform">
+        <label for="post">
+            <input type="text" name="message" id="message" placeholder="Your post message">
+        </label>
+        <button type="button" value="sendpost" onclick="sendpost();">Send</button>
+    </form>
+
+    <div id="chat-messages"></div>
+
+</div>
+
+<img src="../static/image/cat.jpg" alt="image of a cat">
+
+</body>
 </html>
