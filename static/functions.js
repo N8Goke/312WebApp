@@ -67,3 +67,26 @@ function like(id)
     request.setRequestHeader('Content-Type', 'application/json')
     request.send(JSON.stringify(data))
 }
+function allusers()
+{
+    request = new XMLHttpRequest();   
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            allusers = document.getElementById("allusers");
+
+            response = JSON.parse(this.response)
+            
+            for (let i = 0; i < length; i++) {
+                post = document.createElement("div");
+                post.className = "user";
+                post.innerHTML = "<div class = 'box'/>" + response[i] + "</div/><br>";
+
+                chatMessages.append(post)
+            }
+
+        }
+    }
+    request.open("GET", "/allusers")
+    request.send()
+
+}
