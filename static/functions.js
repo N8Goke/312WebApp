@@ -72,14 +72,18 @@ function allusers()
     request = new XMLHttpRequest();   
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+
             allusers = document.getElementById("allusers");
 
             response = JSON.parse(this.response)
+
+            length = response.length
             
             for (let i = 0; i < length; i++) {
                 post = document.createElement("div");
                 post.className = "user";
-                post.innerHTML = "<div class = 'box'/>" + response[i] + "</div/><br>";
+                post.innerHTML = "<div class = 'box'/>" + response[i]["username"] + "<button onclick='dm()'>DM</button>" + "</div/><br>";
 
                 chatMessages.append(post)
             }
@@ -89,4 +93,17 @@ function allusers()
     request.open("GET", "/allusers")
     request.send()
 
+}
+
+function dm()
+{
+    request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+            window.location.replace("http://localhost:8080/dmpage");
+        }
+    }
+    request.open("POST", "/dm")
+    request.send()
 }
