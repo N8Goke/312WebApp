@@ -1,3 +1,15 @@
 body {
     background-color: lightblue;
 }
+
+.top-right-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
