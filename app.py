@@ -28,9 +28,9 @@ def index():
     #print("INDEX INDEX")
     return render_template("index.html")
 
-# @app.route("/cat.jpg", endpoint="image_route")
-# def image_route():
-#     return send_file('static/image/cat.jpg', mimetype="image/jpeg")
+@app.route("/cat.jpg", endpoint="image_route")
+def image_route():
+    return send_file('static/image/cat.jpg', mimetype="image/jpeg")
 
 
 # Andy - insert username and password into db
@@ -272,9 +272,9 @@ def upload_files():
                     usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
                 
             if usertoken_check != "": # If user is authenticated
-                chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="static/image/'+secured_filename+' alt="Image">'})
+                chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="' + secured_filename + '" alt="Image">'})
             else: # User is guest
-                chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="static/image/'+secured_filename+' alt="Image">'})    
+                chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="' + secured_filename + '" alt="Image">'})    
     
     return redirect("/")
     
