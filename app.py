@@ -1,10 +1,14 @@
-from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file
+from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file, send_from_directory
 from pymongo import MongoClient
+from werkzeug.utils import secure_filename
 import json
 import bcrypt
 import html
 import secrets
 import hashlib
+import uuid
+import os
+import random
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -13,16 +17,16 @@ user_collection = db["userInfo"]
 chat_collection = db["projectChat"]
 count_collection = db["chatcounter"]
 
+upload_path = "static/image/"
+allowed_extensions = {'jpg','jpeg'}
+
 app = Flask(__name__)
+app.config['UPLOAD_PATH'] = upload_path
 
 @app.route('/')
 def index():
     #print("INDEX INDEX")
     return render_template("index.html")
-
-# @app.route("/cat")
-# def serve_cat():
-#     return render_template('image.html')
 
 @app.route("/cat.jpg", endpoint="image_route")
 def image_route():
@@ -235,26 +239,51 @@ def css():
     response.headers['Content-Type'] = 'text/css'
     return response
 
+# Grabs the file extension from input and checks if it is in the allowed extensions (declared above)
+# def allowed_file(filename):
+#     return '.' in filename and \
+#            filename.rsplit('.', 1)[1].lower() in allowed_extensions
+
+@app.route('/upload-image', methods=['GET','POST'])
+def upload_files():
+    random_id = random.randint(1,999999999)
+    # generated_uuid = uuid.uuid4()
+    # img_uuid = str(generated_uuid)
+
+    if request.method == 'POST':
+        new_file = request.files['file']
+        # file_name = img_uuid+".jpg"
+        if new_file.filename == "":
+            return redirect(request.url)
+        if 'file' in request.files and new_file:
+            secured_filename = secure_filename(new_file.filename)
+            new_file.save(os.path.join(app.config['UPLOAD_PATH'], secured_filename))
+
+            # file_path = upload_path + secured_filename
+            print(secured_filename)
+            print(new_file)
+        # check if user is authenticated or not
+            usertoken_check = ""
+            if 'atoken' in request.cookies:
+                if 'auth_token' in request.cookies:
+                    token = request.cookies.get('atoken')
+                    temp_hash = hashlib.new('sha256')
+                    temp_hash.update(token.encode())
+                    usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+                
+            if usertoken_check != "": # If user is authenticated
+                chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="' + secured_filename + '" alt="Image">'})
+            else: # User is guest
+                chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="' + secured_filename + '" alt="Image">'})    
+    
+    return redirect("/")
+    
+
 # Sets nosniff to all requests.
 @app.after_request
 def add_header(response):
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
-
-# Nate/Danny - Check if username/pass exist in database collection
-# obsolete -- ignore
-# def userCheck(jsonString):
-#     updict = jsonString.loads()
-#     username = updict["username"]
-#     plaintextpass = updict["password"]
-#     dbData = user_collection.findOne({"username": username})
-#     if dbData == None:
-#         return False
-#     else:
-#         is_valid = bcrypt.check_password_hash(dbData["password"], plaintextpass)
-#         return is_valid
-
-
 
 
 if __name__ == '__main__':
