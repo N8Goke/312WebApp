@@ -3,8 +3,6 @@ body {
 }
 
 .top-right-btn {
-    position: fixed;
-    top: 20px;
     right: 20px;
     background-color: #007bff;
     color: white;
@@ -12,4 +10,10 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.top-right {
+    position: fixed;
+    top: 20px;
+    right: 20px;
 }

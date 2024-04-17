@@ -16,6 +16,20 @@ function sendpost()
     request.send(JSON.stringify(data))
 
 }
+function profilepic(){
+    console.log("prof pic called")
+    request = request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+            profilePic = document.getElementById("ProfilePic");
+            profilePic.innerHTML ='<img src="../static/image/cat.jpg" alt="buttonpng" width="100" height="100"/>'
+        }
+    }
+    request.open("GET", "/getprofpic")
+    request.send()
+}
+
 function username()
 {
     request = new XMLHttpRequest();   

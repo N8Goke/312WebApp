@@ -1,5 +1,7 @@
 from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file
 from pymongo import MongoClient
+import os
+from werkzeug.utils import secure_filename
 import json
 import bcrypt
 import html
@@ -12,8 +14,15 @@ db = mongo_client["teamInnovation"]
 user_collection = db["userInfo"]
 chat_collection = db["projectChat"]
 count_collection = db["chatcounter"]
+profile_collection = db["pfpics"]
+
+
 
 app = Flask(__name__)
+
+
+upload_path = "static/image/"
+app.config['UPLOAD_PATH'] = upload_path
 
 @app.route('/')
 def index():
@@ -27,6 +36,67 @@ def index():
 @app.route("/cat.jpg", endpoint="image_route")
 def image_route():
     return send_file('static/image/cat.jpg', mimetype="image/jpeg")
+
+
+
+@app.route('/profile-pic', methods=['GET','POST'])
+def proflie_pic():
+    print(request)
+    print(request.files['file'])
+    if 'atoken' in request.cookies:
+        print("atoken pass")
+        atoken = request.cookies.get('atoken')
+        print(atoken)
+        temp_hash = hashlib.new('sha256')
+        print(temp_hash)
+        temp_hash.update(atoken.encode())
+        dbData = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+        print(dbData)
+        if dbData == None:
+            print("dbdata none")
+            return abort(404)
+        else:
+            print("dbData found")
+            if request.method == 'POST':
+                print("correct request")
+                new_file = request.files['file']
+                print(new_file)
+                if new_file.filename == "":
+                    print("filename none")
+                    return redirect(request.url)
+                if 'file' in request.files and new_file:
+                    print("processing file")
+                    secured_filename = secure_filename(new_file.filename)
+                    new_file.save(os.path.join(app.config['UPLOAD_PATH'], secured_filename))
+                    source = '<img src="' + secured_filename +'"width="100" height="100">'
+                    user= {"username": dbData["username"]}
+                    profLookup = profile_collection.find({"username": dbData["username"]})
+                    if profLookup != None:
+                        profile_collection.update_one(user,{"$set":{"profile":source}})
+                        return redirect("/", code=302)
+                    else:
+                        profile_collection.insert_one({"username": dbData["username"],"profile":source})
+                        return  redirect("/", code=302)
+    else:
+        print("guest upload")
+        return abort(404)
+
+
+@app.route('/getprofpic', methods =['GET'])
+def sendProfilePic():
+    # if 'atoken' in request.cookies:
+    #     print("atoken pass")
+    #     atoken = request.cookies.get('atoken')
+    #     print(atoken)
+    #     temp_hash = hashlib.new('sha256')
+    #     print(temp_hash)
+    #     temp_hash.update(atoken.encode())
+    #     dbData = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+    #     username = dbData["username"]
+    #     profile_collection.find_one({"username":username})
+    response = make_response()
+    response.status_code = 200
+    return response
 
 
 # Andy - insert username and password into db
