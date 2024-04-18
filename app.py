@@ -87,22 +87,28 @@ def image_route():
 @app.route('/getprofpic', methods =['GET'])
 def sendProfilePic():
     if 'atoken' in request.cookies:
+        print("atoken found")
         usertoken_check= ""
         token = request.cookies.get('atoken')
         temp_hash = hashlib.new('sha256')
         temp_hash.update(token.encode())
         usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
-        username = usertoken_check["username"]
-        profile = profile_collection.find_one({"username":username})
-        response = make_response(json.dumps(profile["profile"]))
-        response.status_code = 200
-        return response
         if usertoken_check == "":
+            print("should be a guest")
             guestImage = '<img src="../static/image/Guestprofile.jpg" alt="buttonpng" width="100" height="100"/><br/>'
             testImage ="Guestprofile.png"
             response = make_response(json.dumps(testImage))
             response.status_code = 200
             return response
+        username = usertoken_check["username"]
+        print(profile_collection)
+        print(username)
+        profile = profile_collection.find_one({"username":username})
+        print(profile["profile"])
+        response = make_response(json.dumps(profile["profile"]))
+        response.status_code = 200
+        return response
+
 
 
 # Andy - insert username and password into db
@@ -349,8 +355,12 @@ def proflie_pic():
 
                 if profLookup != None: #If user already has profile pic
                     profile_collection.update_one({"username": usertoken_check["username"]},{"$set":{"profile":secured_filename}})
+                    profLookup = profile_collection.find({"username": usertoken_check["username"]})
+                    print("Prof",profLookup)
                 else:
                     profile_collection.insert_one({"username": usertoken_check["username"],"profile":secured_filename})
+                    profLookup = profile_collection.find({"username": usertoken_check["username"]})
+                    print("Prof", profLookup)
 
     return redirect("/")
 
