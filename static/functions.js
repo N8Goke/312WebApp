@@ -23,7 +23,8 @@ function profilepic(){
         if (this.readyState === 4 && this.status === 200) {
             console.log(this.response);
             profilePic = document.getElementById("ProfilePic");
-            profilePic.innerHTML ='<img src="../static/image/cat.jpg" alt="buttonpng" width="100" height="100"/>'
+            profilePic.innerHTML = '<img src="../static/image/'+JSON.parse(this.response)+'" alt="buttonpng" width="100" height="100"/> <br/>'
+            profilePic.innerHTML += '<button className="top-right-btn">Logout</button>'
         }
     }
     request.open("GET", "/getprofpic")

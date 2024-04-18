@@ -41,64 +41,68 @@ def image_route():
 
 
 
-@app.route('/profile-pic', methods=['GET','POST'])
-def proflie_pic():
-    print(request)
-    print(request.files['file'])
-    if 'atoken' in request.cookies:
-        print("atoken pass")
-        atoken = request.cookies.get('atoken')
-        print(atoken)
-        temp_hash = hashlib.new('sha256')
-        print(temp_hash)
-        temp_hash.update(atoken.encode())
-        dbData = user_collection.find_one({'atoken': temp_hash.hexdigest()})
-        print(dbData)
-        if dbData == None:
-            print("dbdata none")
-            return abort(404)
-        else:
-            print("dbData found")
-            if request.method == 'POST':
-                print("correct request")
-                new_file = request.files['file']
-                print(new_file)
-                if new_file.filename == "":
-                    print("filename none")
-                    return redirect(request.url)
-                if 'file' in request.files and new_file:
-                    print("processing file")
-                    secured_filename = secure_filename(new_file.filename)
-                    new_file.save(os.path.join(app.config['UPLOAD_PATH'], secured_filename))
-                    source = '<img src="' + secured_filename +'"width="100" height="100">'
-                    user= {"username": dbData["username"]}
-                    profLookup = profile_collection.find({"username": dbData["username"]})
-                    if profLookup != None:
-                        profile_collection.update_one(user,{"$set":{"profile":source}})
-                        return redirect("/", code=302)
-                    else:
-                        profile_collection.insert_one({"username": dbData["username"],"profile":source})
-                        return  redirect("/", code=302)
-    else:
-        print("guest upload")
-        return abort(404)
+# @app.route('/profile-pic', methods=['GET','POST'])
+# def proflie_pic():
+#     print(request)
+#     print(request.files['file'])
+#     if 'atoken' in request.cookies:
+#         print("atoken pass")
+#         atoken = request.cookies.get('atoken')
+#         print(atoken)
+#         temp_hash = hashlib.new('sha256')
+#         print(temp_hash)
+#         temp_hash.update(atoken.encode())
+#         dbData = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+#         print(dbData)
+#         if dbData == None:
+#             print("dbdata none")
+#             return abort(404)
+#         else:
+#             print("dbData found")
+#             if request.method == 'POST':
+#                 print("correct request")
+#                 new_file = request.files['file']
+#                 print(new_file)
+#                 if new_file.filename == "":
+#                     print("filename none")
+#                     return redirect(request.url)
+#                 if 'file' in request.files and new_file:
+#                     print("processing file")
+#                     secured_filename = secure_filename(new_file.filename)
+#                     new_file.save(os.path.join(app.config['UPLOAD_PATH'], secured_filename))
+#                     source = '<img src="' + secured_filename +'"width="100" height="100">'
+#                     user= {"username": dbData["username"]}
+#                     profLookup = profile_collection.find({"username": dbData["username"]})
+#                     if profLookup != None:
+#                         profile_collection.update_one(user,{"$set":{"profile":source}})
+#                         return redirect("/", code=302)
+#                     else:
+#                         profile_collection.insert_one({"username": dbData["username"],"profile":source})
+#                         return  redirect("/", code=302)
+#     else:
+#         print("guest upload")
+#         return abort(404)
 
 
 @app.route('/getprofpic', methods =['GET'])
 def sendProfilePic():
-    # if 'atoken' in request.cookies:
-    #     print("atoken pass")
-    #     atoken = request.cookies.get('atoken')
-    #     print(atoken)
-    #     temp_hash = hashlib.new('sha256')
-    #     print(temp_hash)
-    #     temp_hash.update(atoken.encode())
-    #     dbData = user_collection.find_one({'atoken': temp_hash.hexdigest()})
-    #     username = dbData["username"]
-    #     profile_collection.find_one({"username":username})
-    response = make_response()
-    response.status_code = 200
-    return response
+    if 'atoken' in request.cookies:
+        usertoken_check= ""
+        token = request.cookies.get('atoken')
+        temp_hash = hashlib.new('sha256')
+        temp_hash.update(token.encode())
+        usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+        username = usertoken_check["username"]
+        profile = profile_collection.find_one({"username":username})
+        response = make_response(json.dumps(profile["profile"]))
+        response.status_code = 200
+        return response
+        if usertoken_check == "":
+            guestImage = '<img src="../static/image/Guestprofile.jpg" alt="buttonpng" width="100" height="100"/><br/>'
+            testImage ="Guestprofile.png"
+            response = make_response(json.dumps(testImage))
+            response.status_code = 200
+            return response
 
 
 # Andy - insert username and password into db
@@ -312,6 +316,47 @@ def css():
 #     return '.' in filename and \
 #            filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
+
+@app.route('/profile-pic', methods=['GET','POST'])
+def proflie_pic():
+    print("here")
+    if request.method == 'POST':
+        print("post")
+        new_file = request.files['file']
+        # file_name = img_uuid+".jpg"
+        if new_file.filename == "":
+            print("empty filename")
+            return redirect(request.url)
+        if 'file' in request.files and new_file:
+            print("good file is here")
+            secured_filename = secure_filename(new_file.filename)
+            new_file.save(os.path.join(app.config['UPLOAD_PATH'], secured_filename))
+
+            # file_path = upload_path + secured_filename
+            print(secured_filename)
+            print(new_file)
+            # check if user is authenticated or not
+            usertoken_check = ""
+            if 'atoken' in request.cookies:
+                    print("atoken")
+                    token = request.cookies.get('atoken')
+                    temp_hash = hashlib.new('sha256')
+                    temp_hash.update(token.encode())
+                    usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+            source = '<img src="../static/image/' + secured_filename +'"width="100" height="100">'
+            if usertoken_check != "": # If user is authenticated
+                profLookup = profile_collection.find({"username": usertoken_check["username"]})
+
+                if profLookup != None: #If user already has profile pic
+                    profile_collection.update_one({"username": usertoken_check["username"]},{"$set":{"profile":secured_filename}})
+                else:
+                    profile_collection.insert_one({"username": usertoken_check["username"],"profile":secured_filename})
+
+    return redirect("/")
+
+
+
+
 @app.route('/upload-image', methods=['GET','POST'])
 def upload_files():
     random_id = random.randint(1,999999999)
@@ -340,9 +385,9 @@ def upload_files():
                     usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
 
             if usertoken_check != "": # If user is authenticated
-                chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="' + secured_filename + '" alt="Image">'})
+                chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="' + secured_filename + '" alt="Image">',"likes":0})
             else: # User is guest
-                chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="' + secured_filename + '" alt="Image">'})
+                chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="' + secured_filename + '" alt="Image">',"likes":0})
 
     return redirect("/")
 
