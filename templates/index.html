@@ -6,7 +6,7 @@
     <script type="text/javascript" src="../static/functions.js"></script>
     <script type="text/javascript" src="../static/login.js"></script>
 </head>
-<body onload="allposts(); username(); allusers(); profilepic()">
+<body onload="welcome()">
 <h1>Home</h1>
 <div class="reg-login-forms">
     <h2>Registration:</h2>
@@ -35,16 +35,11 @@
     <br/>
     <form action ="/profile-pic" method="post" enctype="multipart/form-data">
         <br/>
-        <label for="form-file">Upload image: </label>
+        <label for="form-file">Upload Profile Pic: </label>
         <input id ="form-file2" type="file"  name="file">
         <input type="submit" value="Upload">
     </form>
 
-    <h2>Logout:</h2>
-    <form action="logout" method="post" enctype="applications/x-www-form-urlencoded">
-        <!-- <input id="submit" value="logout"> -->
-        <button type="logoutbutton" value="loguout" onclick="logout()">Logout</button>
-    </form>
     <br>
     <h2>Posts</h2>
     <form id = "sendpostform">
@@ -72,7 +67,6 @@
 
 <div id ="ProfilePic" class="top-right">
     <img src="../static/image/Guestprofile.png" alt="buttonpng" width="100" height="100"/><br/>
-    <button class="top-right-btn">Logout</button>
 </div>
 
 </body>

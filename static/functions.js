@@ -23,8 +23,9 @@ function profilepic(){
         if (this.readyState === 4 && this.status === 200) {
             console.log(this.response);
             profilePic = document.getElementById("ProfilePic");
-            profilePic.innerHTML = '<img src="../static/image/'+JSON.parse(this.response)+'" alt="buttonpng" width="100" height="100"/> <br/>'
-            profilePic.innerHTML += '<button className="top-right-btn">Logout</button>'
+            profilePic.innerHTML = '<img src="../static/image/'+JSON.parse(this.response)+'" alt="buttonpng" width="100" height="100"/><br/>'
+            profilePic.innerHTML += '<form action="logout" method="post" enctype="applications/x-www-form-urlencoded">'
+             + '<button className="top-right-btn" onclick="logout()">Logout</button> </form>'
         }
     }
     request.open("GET", "/getprofpic")
@@ -56,6 +57,7 @@ function allposts()
             response = JSON.parse(this.response)
 
             length = response.length
+            chatMessages.innerHTML = ""
 
             for (let i = 0; i < length; i++) {
                 post = document.createElement("div");
@@ -121,4 +123,12 @@ function dm()
     }
     request.open("POST", "/dm")
     request.send()
+}
+
+function welcome(){
+    allposts()
+    username();
+    allusers();
+    profilepic()
+    setInterval(allposts,5000)
 }

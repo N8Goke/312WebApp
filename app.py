@@ -41,71 +41,35 @@ def image_route():
 
 
 
-# @app.route('/profile-pic', methods=['GET','POST'])
-# def proflie_pic():
-#     print(request)
-#     print(request.files['file'])
-#     if 'atoken' in request.cookies:
-#         print("atoken pass")
-#         atoken = request.cookies.get('atoken')
-#         print(atoken)
-#         temp_hash = hashlib.new('sha256')
-#         print(temp_hash)
-#         temp_hash.update(atoken.encode())
-#         dbData = user_collection.find_one({'atoken': temp_hash.hexdigest()})
-#         print(dbData)
-#         if dbData == None:
-#             print("dbdata none")
-#             return abort(404)
-#         else:
-#             print("dbData found")
-#             if request.method == 'POST':
-#                 print("correct request")
-#                 new_file = request.files['file']
-#                 print(new_file)
-#                 if new_file.filename == "":
-#                     print("filename none")
-#                     return redirect(request.url)
-#                 if 'file' in request.files and new_file:
-#                     print("processing file")
-#                     secured_filename = secure_filename(new_file.filename)
-#                     new_file.save(os.path.join(app.config['UPLOAD_PATH'], secured_filename))
-#                     source = '<img src="' + secured_filename +'"width="100" height="100">'
-#                     user= {"username": dbData["username"]}
-#                     profLookup = profile_collection.find({"username": dbData["username"]})
-#                     if profLookup != None:
-#                         profile_collection.update_one(user,{"$set":{"profile":source}})
-#                         return redirect("/", code=302)
-#                     else:
-#                         profile_collection.insert_one({"username": dbData["username"],"profile":source})
-#                         return  redirect("/", code=302)
-#     else:
-#         print("guest upload")
-#         return abort(404)
+
 
 
 @app.route('/getprofpic', methods =['GET'])
 def sendProfilePic():
     if 'atoken' in request.cookies:
-        print("atoken found")
         usertoken_check= ""
         token = request.cookies.get('atoken')
         temp_hash = hashlib.new('sha256')
         temp_hash.update(token.encode())
         usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+
+        #Guests Image
         if usertoken_check == "":
-            print("should be a guest")
             guestImage = '<img src="../static/image/Guestprofile.jpg" alt="buttonpng" width="100" height="100"/><br/>'
             testImage ="Guestprofile.png"
             response = make_response(json.dumps(testImage))
             response.status_code = 200
             return response
-        username = usertoken_check["username"]
-        print(profile_collection)
-        print(username)
-        profile = profile_collection.find_one({"username":username})
-        print(profile["profile"])
-        response = make_response(json.dumps(profile["profile"]))
+
+        #User has no pfp, send guest image
+        if usertoken_check["pfp"] == "":
+            testImage ="Guestprofile.png"
+            response = make_response(json.dumps(testImage))
+            response.status_code = 200
+            return response
+
+        #User has profile picture
+        response = make_response(json.dumps(usertoken_check["pfp"]))
         response.status_code = 200
         return response
 
@@ -131,6 +95,7 @@ def registrationServer():
     data2 = {}
     data2['username'] = html.escape(username)
     data2['password'] = password
+    data2["pfp"] = ""
 
     #check if username already exists. If it exists we exist, otherwise we insert
     query = {"username": username}
@@ -349,18 +314,8 @@ def proflie_pic():
                     temp_hash = hashlib.new('sha256')
                     temp_hash.update(token.encode())
                     usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
-            source = '<img src="../static/image/' + secured_filename +'"width="100" height="100">'
-            if usertoken_check != "": # If user is authenticated
-                profLookup = profile_collection.find({"username": usertoken_check["username"]})
-
-                if profLookup != None: #If user already has profile pic
-                    profile_collection.update_one({"username": usertoken_check["username"]},{"$set":{"profile":secured_filename}})
-                    profLookup = profile_collection.find({"username": usertoken_check["username"]})
-                    print("Prof",profLookup)
-                else:
-                    profile_collection.insert_one({"username": usertoken_check["username"],"profile":secured_filename})
-                    profLookup = profile_collection.find({"username": usertoken_check["username"]})
-                    print("Prof", profLookup)
+            if usertoken_check != "": # If user is authenticated update profile picture.
+                user_collection.update_one({"username": usertoken_check["username"]}, {"$set": {"pfp":secured_filename}})
 
     return redirect("/")
 
@@ -395,9 +350,9 @@ def upload_files():
                     usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
 
             if usertoken_check != "": # If user is authenticated
-                chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="' + secured_filename + '" alt="Image">',"likes":0})
+                chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="../static/image/' + secured_filename + '" alt="Image">',"likes":0})
             else: # User is guest
-                chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="' + secured_filename + '" alt="Image">',"likes":0})
+                chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="../static/image/' + secured_filename + '" alt="Image">',"likes":0})
 
     return redirect("/")
 
