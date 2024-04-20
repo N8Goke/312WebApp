@@ -39,6 +39,9 @@ def index():
 def image_route():
     return send_file('static/image/cat.jpg', mimetype="image/jpeg")
 
+@app.route("/dmpage")
+def dmpage():
+    return render_template("dmpage.html")
 
 
 
@@ -153,7 +156,7 @@ def login():
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    print("temporary")
+    #print("temporary")
     if 'atoken' in request.cookies:
         token = request.cookies.get('atoken')
     
@@ -238,7 +241,7 @@ def like():
     id = data.get("id")
 
     post_info = chat_collection.find_one({'id': id})
-    print(post_info)
+    #print(post_info)
     likedBy = post_info["likedBy"]
 
 
@@ -248,7 +251,7 @@ def like():
 
 
     user_info = user_collection.find_one({"atoken": hash1.hexdigest()})
-    print(user_info)
+    #print(user_info)
     username = user_info["username"]
 
     if username in likedBy:
@@ -288,6 +291,38 @@ def allusers():
 
     print(alluserlist)
     return alluserlist
+
+@app.route('/dm', methods = ["POST"])
+def dm():
+    data = request.get_json()
+    username = data.get("username")
+
+    response = make_response()
+    response.set_cookie("dm_user", username)
+    return response
+
+@app.route("/dm_usernames", methods = ["GET"])
+def dm_usernames():
+    user1 = "guest"
+    if request.cookies.get("atoken") != None:
+
+
+        atoken = request.cookies.get("atoken")
+        hash1 = hashlib.new('sha256')
+        hash1.update(atoken.encode())
+
+        details = user_collection.find_one({"atoken": hash1.hexdigest()})
+        #print(details)
+        if details != None:
+            user1 = details["username"]
+    
+    user2 = request.cookies.get("dm_user")
+
+    list1 = [user1, user2]
+
+    return list1
+
+
 
 @app.route('/style.css')
 def css():

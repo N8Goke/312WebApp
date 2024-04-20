@@ -100,7 +100,7 @@ function allusers()
             for (let i = 0; i < length; i++) {
                 post = document.createElement("div");
                 post.className = "user";
-                post.innerHTML = "<div class = 'box'/>" + response[i]["username"] + "<button onclick='dm()'>DM</button>" + "</div/><br>";
+                post.innerHTML = "<div class = 'box'/>" + response[i]["username"] + "<button onclick='dm(\"" + response[i]["username"] + "\")'>DM</button>" + "</div/><br>";
 
                 allusers.append(post)
             }
@@ -112,7 +112,7 @@ function allusers()
 
 }
 
-function dm()
+function dm(username)
 {
     request = new XMLHttpRequest();
     request.onreadystatechange = function () {
@@ -121,8 +121,10 @@ function dm()
             window.location.replace("http://localhost:8080/dmpage");
         }
     }
+    user = {"username": username}
     request.open("POST", "/dm")
-    request.send()
+    request.setRequestHeader('Content-Type', 'application/json')
+    request.send(JSON.stringify(user))
 }
 
 function welcome(){
@@ -130,5 +132,5 @@ function welcome(){
     username();
     allusers();
     profilepic()
-    setInterval(allposts,5000)
+    //setInterval(allposts,5000)
 }

@@ -1,5 +1,15 @@
 <html lang="en">
-<head></head>
-<body>
+<head>
+    <script type="text/javascript" src="../static/dm.js"></script>
+</head>
+<body onload="dm_usernames()">
+    <div id = "users"></div>
     dm here
+
+    <form id = "dmform">
+        <label for="dm">
+            <input type="text" name="dm_message" id="dm_message" placeholder="Your DM message">
+        </label>
+        <button type="button" value="sendpost" onclick="sendDM();">Send</button>
+    </form>
 </body>
