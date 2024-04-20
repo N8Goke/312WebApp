@@ -32,13 +32,28 @@ users = {}
 
 @socketio.on('connect')
 def BITCONNECTTT():
+    useratoken = request.cookies.get('atoken')
+    temp_hash = hashlib.new('sha256')
+    temp_hash.update(useratoken.encode())
+    usermain = (user_collection.find_one({'atoken': temp_hash.hexdigest()}))["username"]
+
+    users[usermain] = request.sid
+
     emit('after connect', {'data':'CONNECTION SUCCESS'})
 
 @socketio.on("sendDM")
 def sendDM(data):
-    print("sendDM success", data)
-    print("both users: ", request.cookies.get('atoken'), request.cookies.get('dm_user'))
-    emit('receive_data', {'from_user':"u10", 'message':"message received success"})
+    #print("both users: ", request.cookies.get('atoken'), request.cookies.get('dm_user'))
+
+    user1atoken = request.cookies.get('atoken')
+    temp_hash = hashlib.new('sha256')
+    temp_hash.update(user1atoken.encode())
+
+    user1 = (user_collection.find_one({'atoken': temp_hash.hexdigest()}))["username"]
+    user2 = request.cookies.get('dm_user')
+
+    emit('receive_data', {'from_user':user1, 'message': data["message"]}, to=users[user1])
+    emit('receive_data', {'from_user':user1, 'message': data["message"]}, to=users[user2])
 
 
 

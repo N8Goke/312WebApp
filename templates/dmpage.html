@@ -35,9 +35,7 @@
 
         function sendDM() {
             socket.emit("sendDM", {
-                //fromuser: "u1",
-                //touser: "u2",
-                message: "sendDM success"
+                message: document.getElementById("dm_message").value
             });
         }
 
