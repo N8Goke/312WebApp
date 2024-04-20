@@ -34,7 +34,11 @@ users = {}
 def BITCONNECTTT():
     emit('after connect', {'data':'CONNECTION SUCCESS'})
 
-
+@socketio.on("sendDM")
+def sendDM(data):
+    print("sendDM success", data)
+    print("both users: ", request.cookies.get('atoken'), request.cookies.get('dm_user'))
+    emit('receive_data', {'from_user':"u10", 'message':"message received success"})
 
 
 

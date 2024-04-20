@@ -12,5 +12,5 @@ function dm_usernames()
         }
     }
     request.open("GET", "/dm_usernames")
-    request.send(JSON.stringify())
+    request.send()
 }
