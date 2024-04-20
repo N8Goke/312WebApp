@@ -102,7 +102,7 @@ function allusers()
                 post.className = "user";
                 post.innerHTML = "<div class = 'box'/>" + response[i]["username"] + "<button onclick='dm()'>DM</button>" + "</div/><br>";
 
-                chatMessages.append(post)
+                allusers.append(post)
             }
 
         }

@@ -276,6 +276,19 @@ def username():
     else:
         return user_info["username"]
 
+@app.route('/allusers', methods = ["GET"])
+def allusers():
+    alluserdata = user_collection.find()
+
+    alluserlist = []
+    for x in alluserdata:
+        userdata = {}
+        userdata["username"] = x["username"]
+        alluserlist.append(userdata)
+
+    print(alluserlist)
+    return alluserlist
+
 @app.route('/style.css')
 def css():
     response = make_response('/static/style.css')
