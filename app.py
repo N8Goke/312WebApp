@@ -1,4 +1,5 @@
 from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file, send_from_directory
+from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
 import json
@@ -19,16 +20,38 @@ count_collection = db["chatcounter"]
 profile_collection = db["pfpics"]
 
 
-
-upload_path = "static/image/"
 allowed_extensions = {'jpg','jpeg'}
 
 app = Flask(__name__)
-app.config['UPLOAD_PATH'] = upload_path
-
-
+app.config['SECRET_KEY'] = "secret123"
 upload_path = "static/image/"
 app.config['UPLOAD_PATH'] = upload_path
+socketio = SocketIO(app)
+
+users = {}
+
+@socketio.on('connect')
+def BITCONNECTTT():
+    emit('after connect', {'data':'CONNECTION SUCCESS'})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/')
 def index():
@@ -413,6 +436,6 @@ def add_header(response):
 
 
 if __name__ == '__main__':
-    app.run(host = '0.0.0.0', port = 8080)
+    socketio.run(app, host = '0.0.0.0', port = 8080, allow_unsafe_werkzeug = True)
 
 
