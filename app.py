@@ -29,7 +29,16 @@ app.config['UPLOAD_PATH'] = upload_path
 socketio = SocketIO(app)
 
 users = {}
+liveDms = {}
 
+
+
+@socketio.on("PFP")
+def sendProfPicUser(data):
+    print("sending pfp")
+    user = data["message"]
+    usertoken_check = user_collection.find_one({'username': user})
+    emit("PFP",{"pfp": usertoken_check["pfp"]})
 @socketio.on('connect')
 def BITCONNECTTT():
     useratoken = request.cookies.get('atoken')
@@ -38,22 +47,41 @@ def BITCONNECTTT():
     usermain = (user_collection.find_one({'atoken': temp_hash.hexdigest()}))["username"]
 
     users[usermain] = request.sid
-
+    print(liveDms)
     emit('after connect', {'data':'CONNECTION SUCCESS'})
 
 @socketio.on("sendDM")
 def sendDM(data):
+    print("Sending dm")
     #print("both users: ", request.cookies.get('atoken'), request.cookies.get('dm_user'))
-
     user1atoken = request.cookies.get('atoken')
     temp_hash = hashlib.new('sha256')
     temp_hash.update(user1atoken.encode())
 
     user1 = (user_collection.find_one({'atoken': temp_hash.hexdigest()}))["username"]
     user2 = request.cookies.get('dm_user')
+    if user2 not in liveDms or liveDms.get(user1) == user2:
+        liveDms[user1] = user2
+        liveDms[user2] = user1
 
-    emit('receive_data', {'from_user':user1, 'message': data["message"]}, to=users[user1])
-    emit('receive_data', {'from_user':user1, 'message': data["message"]}, to=users[user2])
+        emit('receive_data', {'from_user':user1, 'message': data["message"]}, to=users[user1])
+        emit('receive_data', {'from_user':user1, 'message': data["message"]}, to=users[user2])
+    else:
+        emit('receive_data', {'from_user':user1, 'message': "USER DMING SOMEONE"}, to=users[user1])
+
+
+@socketio.on("disconnect")
+def discconectDM():
+    user1atoken = request.cookies.get('atoken')
+    temp_hash = hashlib.new('sha256')
+    temp_hash.update(user1atoken.encode())
+
+    user1 = (user_collection.find_one({'atoken': temp_hash.hexdigest()}))["username"]
+    user2 = request.cookies.get('dm_user')
+    liveDms.pop(user1)
+    print(liveDms)
+    emit('receive_data', {'from_user':user1, 'message': "LEFT CHAT"}, to=users[user2])
+
 
 
 
@@ -86,7 +114,11 @@ def dmpage():
     return render_template("dmpage.html")
 
 
-
+@app.route("/callpythonPFP",methods =["POST"])
+def sendProfPicUser():
+    user = request.json['value']
+    usertoken_check = user_collection.find_one({'username': user})
+    return jsonify(result=usertoken_check["pfp"])
 
 
 @app.route('/getprofpic', methods =['GET'])

@@ -32,6 +32,10 @@ function profilepic(){
     request.send()
 }
 
+
+
+
+
 function username()
 {
     request = new XMLHttpRequest();   

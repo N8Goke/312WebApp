@@ -17,19 +17,26 @@
     </form>
 
     <script>
-        
+
         $(document).ready(function(){
             socket = io.connect("http://localhost:8080", {transports: ['websocket']});
 
             socket.on('after connect', function(msg) {
                 console.log('After Connect', msg)
+
             });
 
             socket.on('receive_data', function(data) {
-                dm_posts = document.getElementById("dm_posts")
-
-                dm_posts.innerHTML += (data["from_user"] + ": " + data["message"] + "<br>")
-            })
+                console.log("Recv")
+                let pfp = ""
+                dm_posts = document.getElementById("dm_posts");
+                socket.emit("PFP",{"message":data["from_user"]});
+                socket.on("PFP",function(data2){
+                    console.log("PFP Request")
+                    pfp = data2["pfp"]
+                    dm_posts.innerHTML += '<img src="../static/image/'+data2["pfp"]+'" alt="buttonpng" width="50" height="50"/>'+ data["from_user"] + ": " + data["message"] + "<br>";
+                });
+            });
 
         });
 
@@ -37,7 +44,12 @@
             socket.emit("sendDM", {
                 message: document.getElementById("dm_message").value
             });
+
+        }
+        function sendDisconnect() {
+            socket.emit("disconnect")
         }
 
     </script>
+    <a href="/" class="button" onclick="sendDisconnect()">Back to Main Page</a>
 </body>
