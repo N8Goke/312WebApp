@@ -28,14 +28,10 @@
 
             socket.on('receive_data', function(data) {
                 console.log("Recv")
-                let pfp = ""
+
                 dm_posts = document.getElementById("dm_posts");
-                socket.emit("PFP",{"message":data["from_user"]});
-                socket.on("PFP",function(data2){
-                    console.log("PFP Request")
-                    pfp = data2["pfp"]
-                    dm_posts.innerHTML += '<img src="../static/image/'+data2["pfp"]+'" alt="buttonpng" width="50" height="50"/>'+ data["from_user"] + ": " + data["message"] + "<br>";
-                });
+
+                dm_posts.innerHTML += ("<img src = '../static/image/" + data["pfp"] + "'width='50' height='50'/>" + data["from_user"] + ": " + data["message"] + "<br>")
             });
 
         });
