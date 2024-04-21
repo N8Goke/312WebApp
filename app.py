@@ -35,10 +35,14 @@ liveDms = {}
 
 
 def get_pfp(username):
-    userdata = user_collection.find_one({'username': username})
-    #return userdata["pfp"]
-    return "cat.jpg"
     
+    userdata = user_collection.find_one({'username': username})
+    if userdata["pfp"] != "":
+        return userdata["pfp"]
+    else:
+        return "Guestprofile.png"
+
+
 @socketio.on('connect')
 def BITCONNECTTT():
     useratoken = request.cookies.get('atoken')
