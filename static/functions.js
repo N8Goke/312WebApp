@@ -122,7 +122,7 @@ function dm(username)
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             console.log(this.response);
-            window.location.replace("http://localhost:8080/dmpage");
+            window.location.replace("/dmpage");
         }
     }
     user = {"username": username}
@@ -136,5 +136,5 @@ function welcome(){
     username();
     allusers();
     profilepic()
-    //setInterval(allposts,5000)
+    setInterval(allposts,5000)
 }
