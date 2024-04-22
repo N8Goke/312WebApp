@@ -1,10 +1,13 @@
 version: '3'
 services:
-  #nginx:
-  #  build: ./nginx
-  #  ports:
-  #    - '80:80'
-  #    - '443:443'
+  nginx:
+    image: nginx:latest
+    container_name: reverse_proxy
+    volumes:
+      - ./nginx.conf:/etc/nginc/nginx.conf
+    ports:
+      - '81:80'
+      - '444:443'
   mongo:
     image: mongo:4.2.5
   app:
