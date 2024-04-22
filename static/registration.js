@@ -4,7 +4,7 @@ function register()
     request.onreadystatechange = function () {
         if (this.readyState === 4 && this.status === 200) {
             console.log(this.response);
-            window.location.replace("http://localhost:8080/");
+            window.location.replace("");
         } 
         if (this.readyState == 4 && this.status != 200) {
             alert("username or password invalid")

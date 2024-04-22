@@ -70,8 +70,8 @@ def sendDM(data):
         liveDms[user1] = user2
         liveDms[user2] = user1
 
-        emit('receive_data', {'from_user':user1, 'message': data["message"], 'pfp': get_pfp(user1)}, to=users[user1])
-        emit('receive_data', {'from_user':user1, 'message': data["message"], 'pfp': get_pfp(user1)}, to=users[user2])
+        emit('receive_data', {'from_user':user1, 'message': html.escape(data["message"]), 'pfp': get_pfp(user1)}, to=users[user1])
+        emit('receive_data', {'from_user':user1, 'message': html.escape(data["message"]), 'pfp': get_pfp(user1)}, to=users[user2])
     else:
         emit('receive_data', {'from_user':user1, 'message': "USER DMING SOMEONE", 'pfp': get_pfp(user1)}, to=users[user1])
 
