@@ -1,0 +1,51 @@
+<html lang="en">
+<head>
+    <script type="text/javascript" src="../static/dm.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+    <script src = "https://code.jquery.com/jquery-3.3.1.js"></script>
+</head>
+<body onload="dm_usernames()">
+    <div id = "users"></div>
+    dm here
+    <div id = "dm_posts"></div>
+
+    <form id = "dmform">
+        <label for="dm">
+            <input type="text" name="dm_message" id="dm_message" placeholder="Your DM message">
+        </label>
+        <button type="button" value="sendDM" onclick="sendDM();">Send</button>
+    </form>
+
+    <script>
+
+        $(document).ready(function(){
+            socket = io.connect("http://localhost:8080", {transports: ['websocket']});
+
+            socket.on('after connect', function(msg) {
+                console.log('After Connect', msg)
+
+            });
+
+            socket.on('receive_data', function(data) {
+                console.log("Recv")
+
+                dm_posts = document.getElementById("dm_posts");
+
+                dm_posts.innerHTML += ("<img src = '../static/image/" + data["pfp"] + "'width='50' height='50'/>" + data["from_user"] + ": " + data["message"] + "<br>")
+            });
+
+        });
+
+        function sendDM() {
+            socket.emit("sendDM", {
+                message: document.getElementById("dm_message").value
+            });
+
+        }
+        function sendDisconnect() {
+            socket.emit("disconnect")
+        }
+
+    </script>
+    <a href="/" class="button" onclick="sendDisconnect()">Back to Main Page</a>
+</body>

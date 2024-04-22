@@ -1,9 +1,15 @@
-version: '2'
+version: '3'
 services:
+  nginx:
+    build: ./nginx
+    ports:
+      - '80:80'
+      - '443:443'
   mongo:
     image: mongo:4.2.5
   app:
     build: .
+    restart: always
     environment:
       WAIT_HOSTS: mongo:27017
     ports:

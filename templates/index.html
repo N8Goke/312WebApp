@@ -1,9 +1,73 @@
-<html>
-    <head>
-        <title>Team Innovation</title>
-    </head>
-    <body>
-        <link  rel="stylesheet" href="/static/style.css">
-        <h1>Index html page woohoo</h1>
-    </body>
+<html lang="en">
+<head>
+    <title>CSE312 Group Project: Team Innovation</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
+    <script type="text/javascript" src="../static/registration.js"></script>
+    <script type="text/javascript" src="../static/functions.js"></script>
+    <script type="text/javascript" src="../static/login.js"></script>
+</head>
+<body onload="welcome()">
+<h1>Home</h1>
+<div class="reg-login-forms">
+    <h2>Registration:</h2>
+    <form id="registration-form">
+        <label for="username">Username:
+            <input type="text" name="username" id="username"  placeholder="Your Username">
+        </label>
+        <label for="password">Password:
+            <input type="password" name="password" id="password"  placeholder="Your Password">
+            <input type="password" name="password2" id="password2"  placeholder="Enter Your Password Again">
+        </label>
+        <button type="button" value="sign-up" onclick="register();">Submit</button>
+    </form>
+    <h2>Login:</h2>
+    <form id="login-form">
+        <label for="username">Username:
+            <input type="text" name="username_login" id="usernameL" placeholder="Your username">
+        </label>
+        <label for="password">Password:
+            <input type="text" name="password_login" id="passwordL" placeholder="Your password">
+        </label>
+        <button type="button" onclick="login();" value="login">login</button>
+    </form>
+
+    <div id = "your_username"><h2>User:</h2></div>
+    <br/>
+    <form action ="/profile-pic" method="post" enctype="multipart/form-data">
+        <br/>
+        <label for="form-file">Upload Profile Pic(JPG/JPEG): </label>
+        <input id ="form-file2" type="file"  name="file">
+        <input type="submit" value="Upload">
+    </form>
+
+    <br>
+    <h2>Posts</h2>
+    <form id = "sendpostform">
+        <label for="post">
+            <input type="text" name="message" id="message" placeholder="Your post message">
+        </label>
+        <button type="button" value="sendpost" onclick="sendpost();">Send</button>
+    </form>
+
+    <div id="chat-messages"></div>
+    <div id="upload-image">
+        <form action="/upload-image" id="image-form-upload" method="post" enctype="multipart/form-data">
+        <label for="form-file-upload">Upload Images (JPG/JPEG Only): </label>
+        <input id="form-file-upload" type="file" name="file">
+        <input type="submit" value="Upload">
+    </div>
+    
+
+</div>
+
+<h2>All Users</h2>
+<div id ="allusers"></div>
+
+<img src="../static/image/cat.jpg" alt="image of a cat">
+
+<div id ="ProfilePic" class="top-right">
+    <img src="../static/image/Guestprofile.png" alt="buttonpng" width="100" height="100"/><br/>
+</div>
+
+</body>
 </html>
