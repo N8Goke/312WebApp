@@ -35,7 +35,7 @@ liveDms = {}
 
 
 def get_pfp(username):
-    
+
     userdata = user_collection.find_one({'username': username})
     if userdata["pfp"] != "":
         return userdata["pfp"]
@@ -66,13 +66,14 @@ def sendDM(data):
     user2 = request.cookies.get('dm_user')
 
 
-    if user2 not in liveDms or liveDms.get(user1) == user2:
+    if user2 not in liveDms or liveDms.get(user2) == user1:
         liveDms[user1] = user2
         liveDms[user2] = user1
 
-        emit('receive_data', {'from_user':user1, 'message': data["message"], 'pfp': get_pfp(user1)}, to=users[user1])
-        emit('receive_data', {'from_user':user1, 'message': data["message"], 'pfp': get_pfp(user1)}, to=users[user2])
+        emit('receive_data', {'from_user':user1, 'message': html.escape(data["message"]), 'pfp': get_pfp(user1)}, to=users[user1])
+        emit('receive_data', {'from_user':user1, 'message': html.escape(data["message"]), 'pfp': get_pfp(user1)}, to=users[user2])
     else:
+        print(liveDms)
         emit('receive_data', {'from_user':user1, 'message': "USER DMING SOMEONE", 'pfp': get_pfp(user1)}, to=users[user1])
 
 
@@ -477,7 +478,7 @@ def upload_files():
                     temp_hash.update(token.encode())
                     usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
 
-            if usertoken_check != "": # If user is authenticated
+            if usertoken_check: # If user is authenticated
                 chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="../static/image/' + secured_filename + '" alt="Image">',"likes":0})
             else: # User is guest
                 chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="../static/image/' + secured_filename + '" alt="Image">',"likes":0})
