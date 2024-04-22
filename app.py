@@ -35,7 +35,7 @@ liveDms = {}
 
 
 def get_pfp(username):
-    
+
     userdata = user_collection.find_one({'username': username})
     if userdata["pfp"] != "":
         return userdata["pfp"]
@@ -477,7 +477,7 @@ def upload_files():
                     temp_hash.update(token.encode())
                     usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
 
-            if usertoken_check != "": # If user is authenticated
+            if usertoken_check: # If user is authenticated
                 chat_collection.insert_one({"id":random_id,"username":usertoken_check.get('username'), "message":'<img src="../static/image/' + secured_filename + '" alt="Image">',"likes":0})
             else: # User is guest
                 chat_collection.insert_one({"id":random_id,"username":"Guest", "message":'<img src="../static/image/' + secured_filename + '" alt="Image">',"likes":0})
