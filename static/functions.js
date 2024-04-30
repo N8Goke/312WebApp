@@ -140,6 +140,6 @@ function welcome(){
 }
 
 function toggleDarkMode(){
-    var element = document.documentElement;
+    var element = document.body;
     element.classList.toggle("dark-mode");
 }
