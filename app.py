@@ -1,4 +1,4 @@
-from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file, send_from_directory
+from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file,send_from_directory
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
@@ -10,6 +10,9 @@ import hashlib
 import uuid
 import os
 import random
+import datetime
+from zoneinfo import ZoneInfo
+from apscheduler.schedulers.background import BackgroundScheduler
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -28,10 +31,26 @@ upload_path = "static/image/"
 app.config['UPLOAD_PATH'] = upload_path
 socketio = SocketIO(app)
 
+
+
+
 users = {}
 liveDms = {}
+clickerLeaderboard = []
 
+def sendButton():
+    clickerLeaderboard.clear()
+    for user in users:
+        socketio.emit("displayButton", to=users[user])
 
+def removeButton():
+    for user in users:
+        socketio.emit("removeButton",to=users[user])
+
+scheduler = BackgroundScheduler(daemon=True)
+scheduler.add_job(sendButton, 'interval',seconds=10)
+scheduler.add_job(removeButton, 'interval',seconds=15)
+scheduler.start()
 
 
 def get_pfp(username):
@@ -53,6 +72,17 @@ def BITCONNECTTT():
     users[usermain] = request.sid
     print(liveDms)
     emit('after connect', {'data':'CONNECTION SUCCESS'})
+
+@socketio.on("clickerGame")
+def updateLeaderboard(data):
+    useratoken = request.cookies.get('atoken')
+    temp_hash = hashlib.new('sha256')
+    temp_hash.update(useratoken.encode())
+    user = (user_collection.find_one({'atoken': temp_hash.hexdigest()}))["username"]
+    clickerLeaderboard.append([user,data["time"]])
+    for user in users:
+        emit("updatedLeaderboard", {"data":clickerLeaderboard},to=users[user])
+
 
 @socketio.on("sendDM")
 def sendDM(data):
@@ -95,18 +125,6 @@ def discconectDM():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 @app.route('/')
 def index():
     #print("INDEX INDEX")
@@ -119,6 +137,35 @@ def image_route():
 @app.route("/dmpage")
 def dmpage():
     return render_template("dmpage.html")
+
+
+@app.route('/time')
+def time():
+    return {'time': datetime.datetime.now(ZoneInfo("America/New_York")).strftime('%H:%M:%S')}
+
+@app.route("/clicker")
+def grouppage():
+    return render_template("clicker.html")
+
+@app.route("/clickerpage", methods =['POST'])
+def sendtoGroupPage():
+    if 'atoken' in request.cookies:
+        usertoken_check= ""
+        token = request.cookies.get('atoken')
+        temp_hash = hashlib.new('sha256')
+        temp_hash.update(token.encode())
+        usertoken_check = user_collection.find_one({'atoken': temp_hash.hexdigest()})
+
+       
+        # if usertoken_check == "":
+        #     return abort(404)
+        print("making response")
+        response = make_response()
+        response.set_cookie("groupUser",usertoken_check["username"])
+        response.status_code = 200
+        return response
+        
+
 
 
 @app.route("/callpythonPFP",methods =["POST"])

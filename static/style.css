@@ -18,6 +18,14 @@ body {
     right: 20px;
 }
 
+.groups-btn {
+    position: fixed;
+    top: 20px;
+    right: 140px;  /* Sum of the width of .top-right plus 20px for spacing */
+    width: 100px;  /* Matching width for illustration */
+    height: 50px;  /* Matching height for illustration */
+}
+
 .dark-mode {
     background-color: black;
     color: white;

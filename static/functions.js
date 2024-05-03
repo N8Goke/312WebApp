@@ -32,7 +32,14 @@ function profilepic(){
     request.send()
 }
 
-
+function updateTime() {
+    fetch('/time')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('time').innerText = data.time;
+        });
+    setTimeout(updateTime, 1000); // Update time every second
+}
 
 
 
@@ -114,6 +121,22 @@ function allusers()
     request.open("GET", "/allusers")
     request.send()
 
+}
+
+
+function clickerPage(){
+    console.log("print in group page")
+    request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        if (this.readyState === 4 && this.status === 200) {
+            console.log(this.response);
+            window.location.replace("/clicker");
+        }
+    }
+    user = {"username": username}
+    request.open("POST", "/clickerpage")
+    request.setRequestHeader('Content-Type', 'application/json')
+    request.send(JSON.stringify())
 }
 
 function dm(username)
