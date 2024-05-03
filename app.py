@@ -489,7 +489,7 @@ def dm_usernames():
 
 
 
-@app.route('/static/style.css')
+@app.route('/style.css')
 def css():
     response = make_response('/static/style.css')
     response.headers['Content-Type'] = 'text/css'
