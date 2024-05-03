@@ -2,3 +2,4 @@ flask
 pymongo
 bcrypt
 flask_socketio
+APScheduler

@@ -1,0 +1,90 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+    <title>Welcome to Clicker!!</title>
+    <a href="/" class="button" onclick="sendDisconnect()">Back to Main Page</a>
+    <link rel="stylesheet" type="text/css" href="/static/clicker.css"/>
+    <script type="text/javascript" src="../static/functions.js"></script>
+    <script src = "https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+    <script src = "https://code.jquery.com/jquery-3.3.1.js"></script>
+</head>
+
+
+<script>
+var socket;
+function clickerGame(timeClicked){
+        socket.emit("clickerGame", {
+            time: timeClicked 
+            
+        });
+    }
+
+    $(document).ready(function(){
+    socket = io.connect(window.location.host, {secure: true,transports: ['websocket']});
+
+    socket.on('updatedLeaderboard', function(data) {
+        leaderboard = document.getElementById("leaderboard")
+        leaderboard.innerHTML = "Leaderboard <br>"
+        for (user of data["data"]){
+            leaderboard.innerHTML += user[0] + " " + String(user[1])
+        }
+
+    });
+
+    
+
+});
+
+</script>
+<body onload="updateTime()">
+<div id="left">
+    <div id="buttonNTime" class="time-div">
+        <h1>Current Time: <span id="time"></span></h1><br>
+        Button will be displayed every 10 seconds, be ready!!
+    </div>
+</div>
+<div id="right">
+  <div id= "leaderboard" class="leaderboard-div">
+    Leaderboard <br>
+  </div>
+</div>
+</body>
+
+<script>
+    $(document).ready(function(){
+    socket = io.connect(window.location.host, {secure: true,transports: ['websocket']});
+
+    socket.on('updatedLeaderboard', function(data) {
+        leaderboard = document.getElementById("leaderboard")
+        leaderboard.innerHTML = ""
+        leaderboard.innerHTML = "Leaderboard <br>"
+        for (user of data["data"]){
+            leaderboard.innerHTML += user[0] + " " + String(user[1]) + "<br>"
+        }
+
+    });
+    
+    socket.on("displayButton", function(){
+        buttonDiv = document.getElementById("left")
+        buttonDiv.innerHTML = ""
+        buttonDiv.innerHTML += "<div id='buttonNTime' class='time-div'><h1>Current Time: <span id='time'></span></h1><br>Button will be displayed every 10 seconds, be ready!!</div><br>"
+        buttonDiv.innerHTML += "<button class='red-button' onclick='clickerGame(document.getElementById(\"time\").innerText)'>Dont Click Me!!</button>"
+    });
+
+    socket.on("removeButton", function(){
+        buttonDiv = document.getElementById("left")
+        buttonDiv.innerHTML = ""
+        buttonDiv.innerHTML += "<div id='buttonNTime' class='time-div'><h1>Current Time: <span id='time'></span></h1><br>Button will be displayed every 10 seconds, be ready!!</div><br>"
+    });
+
+    function clickerGame(timeClicked){
+        socket.emit("clickerGame", {
+            time: timeClicked 
+            
+        });
+    }
+
+
+});
+
+</script>
+</html>
