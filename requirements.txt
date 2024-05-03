@@ -3,3 +3,4 @@ pymongo
 bcrypt
 flask_socketio
 APScheduler
+Flask-Limiter

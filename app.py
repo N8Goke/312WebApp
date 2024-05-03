@@ -1,4 +1,4 @@
-from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file,send_from_directory
+from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file, send_from_directory
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
@@ -13,6 +13,10 @@ import random
 import datetime
 from zoneinfo import ZoneInfo
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import time as time69
 
 mongo_client = MongoClient("mongo")
 db = mongo_client["teamInnovation"]
@@ -30,6 +34,47 @@ app.config['SECRET_KEY'] = "secret123"
 upload_path = "static/image/"
 app.config['UPLOAD_PATH'] = upload_path
 socketio = SocketIO(app)
+
+blocked_ips = {}
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["10 per 10 seconds"],
+    storage_uri="memory://",
+)
+
+@app.errorhandler(429)
+def handle_rate_limit_exceeded(e):
+    ip_addr = request.remote_addr
+    if ip_addr in blocked_ips and blocked_ips[ip_addr] > time69.time():
+        print("b")
+        print("b")
+        print("b")
+        return jsonify({'message': f'IP address {ip_addr} blocked for 30 seconds. 1'}), 429
+    else:
+        blocked_ips[ip_addr] = time69.time() + 30
+        return jsonify({'message': f'IP address {ip_addr} blocked for 30 seconds. 2'}), 429
+
+
+@app.route('/')
+def index():
+    ip_addr = request.remote_addr
+    if ip_addr in blocked_ips and blocked_ips[ip_addr] > time69.time():
+        return jsonify({'message': "YOUVE BEEN BLOCKED FOR 30 SECONDS. DO NOT SPAM REFRESH OR ELSE IT WILL BE EXTENDED."}), 429
+    else:
+        return render_template("index.html")
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -121,14 +166,6 @@ def discconectDM():
 
 
 
-
-
-
-
-@app.route('/')
-def index():
-    #print("INDEX INDEX")
-    return render_template("index.html")
 
 @app.route("/cat.jpg", endpoint="image_route")
 def image_route():
@@ -452,12 +489,18 @@ def dm_usernames():
 
 
 
-@app.route('/style.css')
+@app.route('/static/style.css')
 def css():
     response = make_response('/static/style.css')
     response.headers['Content-Type'] = 'text/css'
     return response
 
+"""
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    print("something:", filename)
+    return send_from_directory('static', filename)
+"""
 # Grabs the file extension from input and checks if it is in the allowed extensions (declared above)
 # def allowed_file(filename):
 #     return '.' in filename and \
@@ -541,6 +584,6 @@ def add_header(response):
 
 
 if __name__ == '__main__':
-    socketio.run(app, host = '0.0.0.0', port = 8080, allow_unsafe_werkzeug = True)
+    socketio.run(app, host = '0.0.0.0', port = 8080, debug=True, allow_unsafe_werkzeug = True)
 
 
