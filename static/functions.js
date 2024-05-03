@@ -161,3 +161,8 @@ function welcome(){
     profilepic()
     setInterval(allposts,5000)
 }
+
+function toggleDarkMode(){
+    var element = document.body;
+    element.classList.toggle("dark-mode");
+}

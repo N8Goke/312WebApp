@@ -25,3 +25,8 @@ body {
     width: 100px;  /* Matching width for illustration */
     height: 50px;  /* Matching height for illustration */
 }
+
+.dark-mode {
+    background-color: black;
+    color: white;
+}
