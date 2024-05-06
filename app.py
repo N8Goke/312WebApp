@@ -1,4 +1,4 @@
-from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file, send_from_directory
+from flask import Flask, make_response, render_template, request, redirect, url_for, abort, jsonify, send_file, send_from_directory, Response
 from flask_socketio import SocketIO, emit
 from pymongo import MongoClient
 from werkzeug.utils import secure_filename
@@ -14,6 +14,7 @@ import datetime
 from zoneinfo import ZoneInfo
 from apscheduler.schedulers.background import BackgroundScheduler
 
+import mimetypes
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import time as time69
@@ -38,7 +39,7 @@ socketio = SocketIO(app)
 blocked_ips = {}
 
 limiter = Limiter(
-    get_remote_address,
+    key_func=lambda: request.cookies.get('tempj'),
     app=app,
     default_limits=["10 per 10 seconds"],
     storage_uri="memory://",
@@ -46,11 +47,8 @@ limiter = Limiter(
 
 @app.errorhandler(429)
 def handle_rate_limit_exceeded(e):
-    ip_addr = request.remote_addr
+    ip_addr = request.cookies.get('tempj')
     if ip_addr in blocked_ips and blocked_ips[ip_addr] > time69.time():
-        print("b")
-        print("b")
-        print("b")
         return jsonify({'message': f'IP address {ip_addr} blocked for 30 seconds. 1'}), 429
     else:
         blocked_ips[ip_addr] = time69.time() + 30
@@ -59,10 +57,12 @@ def handle_rate_limit_exceeded(e):
 
 @app.route('/')
 def index():
-    ip_addr = request.remote_addr
+    ip_addr = request.cookies.get('tempj')
     if ip_addr in blocked_ips and blocked_ips[ip_addr] > time69.time():
         return jsonify({'message': "YOUVE BEEN BLOCKED FOR 30 SECONDS. DO NOT SPAM REFRESH OR ELSE IT WILL BE EXTENDED."}), 429
     else:
+        print(ip_addr)
+        print()
         return render_template("index.html")
 
 
@@ -488,19 +488,47 @@ def dm_usernames():
     return list1
 
 
-
-@app.route('/style.css')
+"""
+@app.route('/static/style.css')
 def css():
-    response = make_response('/static/style.css')
-    response.headers['Content-Type'] = 'text/css'
-    return response
-
+    print("css x 123")
+    print("css x 123")
+    print("css x 123")
+    print("css x 123")
+    print("css x 123")
+    return send_from_directory('static', "style.css", mimetype='text/css')
+"""
 """
 @app.route('/static/<path:filename>')
 def static_files(filename):
     print("something:", filename)
     return send_from_directory('static', filename)
 """
+
+@app.route('/static/style.css')
+def serve_static():
+    # Assuming your static files are stored in a directory named "static"
+    # You can adjust the path as needed
+    filename = "style.css"
+    print("w123", filename)
+    print("w123", filename)
+    print("w123", filename)
+
+    static_folder = 'static'
+    filename = "style.css"
+    file_path = f'{static_folder}/{filename}'
+    
+    # Determine the MIME type of the file
+    mime_type, _ = mimetypes.guess_type(file_path)
+    
+    with open(file_path, 'r') as file:
+        file_contents = file.read()
+
+    # Serve the file with the appropriate MIME type
+    return Response(
+        file_contents,
+        mimetype=mime_type
+    )
 # Grabs the file extension from input and checks if it is in the allowed extensions (declared above)
 # def allowed_file(filename):
 #     return '.' in filename and \
