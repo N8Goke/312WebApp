@@ -2,3 +2,11 @@
 
 
 https://frontendisoverrated.net
+
+
+Go to the website. 
+Click on the "Toggle dark mode" button
+Verify it turns on dark mode.
+
+(Note: Objective 1 is the clicker game, it only works locally and requires you to log in)
+(Note: In Objective 2, we have 17 requests every time the page loads, so it didn't make sense to limit requests to 50)
