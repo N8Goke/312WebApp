@@ -10,6 +10,20 @@
 <button onclick="toggleDarkMode()">Toggle dark mode</button>
 
 <body onload="welcome()">
+
+<h2>ip address is: </h2>
+<p id="XD"></p>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $(document).ready(()=>{
+        $.getJSON("https://api.ipify.org?format=json",
+        function (data) {
+            //$("#XD").html(data.ip);
+            document.cookie = "tempj=" + data.ip; 
+         })
+    });
+</script>
+
 <h1>Home</h1>
 <div class="reg-login-forms">
     <h2>Registration:</h2>
